@@ -42,3 +42,6 @@ next-env.d.ts
 
 /app/generated/prisma
 /storage/videos
+/storage/thumbnails
+/storage/audio
+/worker-dist

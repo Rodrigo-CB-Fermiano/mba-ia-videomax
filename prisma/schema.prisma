@@ -47,16 +47,33 @@ model Video {
   durationSeconds  Float?      @map("duration_seconds")
   thumbnailPath    String?     @map("thumbnail_path") @db.VarChar(1000)
   language         String?     @db.VarChar(5)
-  isArchived       Boolean     @default(false) @map("is_archived")
-  createdAt        DateTime    @default(now()) @map("created_at")
-  updatedAt        DateTime    @updatedAt @map("updated_at")
+  isArchived            Boolean                  @default(false) @map("is_archived")
+  retryCount            Int                      @default(0) @map("retry_count")
+  searchVector          Unsupported("tsvector")? @map("search_vector")
+  createdAt             DateTime                 @default(now()) @map("created_at")
+  updatedAt             DateTime                 @updatedAt @map("updated_at")
 
-  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transcriptionSegments TranscriptionSegment[]
 
   @@index([userId])
   @@index([userId, status])
   @@index([userId, uploadedAt])
   @@map("videos")
+}
+
+model TranscriptionSegment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  videoId   String   @map("video_id") @db.Uuid
+  startMs   Int      @map("start_ms")
+  endMs     Int      @map("end_ms")
+  text      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@map("transcription_segments")
 }
 
 model Account {

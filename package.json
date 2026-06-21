@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "worker:build": "esbuild worker/index.ts --bundle --platform=node --target=node22 --format=esm --outfile=worker-dist/index.mjs --external:@prisma/adapter-pg --external:pg --external:@prisma/client",
+    "worker:dev": "npm run worker:build && node --env-file=.env worker-dist/index.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
