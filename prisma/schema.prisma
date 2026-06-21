@@ -55,11 +55,57 @@ model Video {
 
   user                  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   transcriptionSegments TranscriptionSegment[]
+  categories            VideoCategory[]
+  tags                  VideoTag[]
 
   @@index([userId])
   @@index([userId, status])
   @@index([userId, uploadedAt])
   @@map("videos")
+}
+
+model Category {
+  id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String          @unique @db.VarChar(100)
+  slug      String          @unique @db.VarChar(100)
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  videos VideoCategory[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String     @unique @db.VarChar(100)
+  slug      String     @unique @db.VarChar(100)
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  videos VideoTag[]
+
+  @@map("tags")
+}
+
+model VideoCategory {
+  videoId    String @map("video_id") @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+
+  video    Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, categoryId])
+  @@map("video_categories")
+}
+
+model VideoTag {
+  videoId String @map("video_id") @db.Uuid
+  tagId   String @map("tag_id") @db.Uuid
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, tagId])
+  @@map("video_tags")
 }
 
 model TranscriptionSegment {
